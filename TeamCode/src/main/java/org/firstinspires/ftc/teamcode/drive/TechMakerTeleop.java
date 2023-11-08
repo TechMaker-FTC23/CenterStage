@@ -33,6 +33,7 @@ public class TechMakerTeleop extends LinearOpMode {
 
         Claw claw = new Claw(hardwareMap);
 
+        arm.resetArmEncoders();
         waitForStart();
 
 
@@ -43,10 +44,10 @@ public class TechMakerTeleop extends LinearOpMode {
                     new Pose2d(-gamepad1.left_stick_y * mecanumVelocity, -gamepad1.left_stick_x * mecanumVelocity, -gamepad1.right_stick_x * mecanumVelocity));
 
             //Arm
-            if(gamepad1.left_trigger>0.3){
+            if(gamepad1.left_trigger>0.75){
                 arm.activate();
             }
-            if (gamepad1.right_trigger>0.3) {
+            if (gamepad1.right_trigger>0.73) {
                 arm.reverse();
             }
             arm.task(telemetry);
@@ -55,10 +56,7 @@ public class TechMakerTeleop extends LinearOpMode {
             if (gamepad1.x){
                 intake.activate();
             }
-            else{
-                intake.stop();
-            }
-            if (gamepad1.a){
+            else if (gamepad1.a){
                 intake.reverse();
             }
             else{
@@ -83,7 +81,7 @@ public class TechMakerTeleop extends LinearOpMode {
             //Launcher
             if (gamepad1.b){
                 launcher.activate();
-            }
+            }else{launcher.stop();}
 
             //ResetEncoders
             if (gamepad1.back){

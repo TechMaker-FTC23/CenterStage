@@ -15,7 +15,7 @@ public class Arm {
     public double arm_positionL = 0;
     public double errorR = 0;
     public double errorL = 0;
-    public double kP = 0.003;
+    public double kP = 0.001;
     public double armVelocityR = 0;
     public double armVelocityL = 0;
     private DcMotor leftArm, rightArm;
@@ -50,30 +50,30 @@ public class Arm {
     public void resetArmEncoders(){
         rightArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightArm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftArm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
     public void task(Telemetry telemetry){
         //calculo PID do braço;
-            errorL = arm_positionL - leftArm.getCurrentPosition();
-            errorR = arm_positionR - rightArm.getCurrentPosition();
-
-            armVelocityL = errorL * kP;
-            armVelocityR = errorL * kP;
-        if((Math.abs(getCurrentArmPosition())<(arm_positionL*0.95) && arm_positionL>0)
-           ||(Math.abs(getCurrentArmPosition())>(arm_positionL*0.95) && arm_positionL==0))
-        {
+            //errorL = arm_positionL - leftArm.getCurrentPosition();
+            //errorR = arm_positionR - rightArm.getCurrentPosition();
+            leftArm.setTargetPosition((int)arm_positionL);
+            rightArm.setTargetPosition((int)arm_positionR);
+            //armVelocityL = errorL * kP;
+            //armVelocityR = errorR * kP;
+            if(arm_positionL==0)
+                armVelocityL = -0.3;
+            else
+                armVelocityL = 0.7;
             leftArm.setPower(armVelocityL);
-            rightArm.setPower(armVelocityR);
-        }
-        else{
-            leftArm.setPower(0);
-            rightArm.setPower(0);
-        }
-        telemetry.addData("Atual", getCurrentArmPosition());
-        telemetry.addData("Destino",arm_positionR);
-        telemetry.addData("Erro",errorR);
+            rightArm.setPower(armVelocityL);
 
+        telemetry.addData("Atual", getCurrentArmPosition());
+        telemetry.addData("Atual Esquerda", leftArm.getCurrentPosition());
+        telemetry.addData("Atual Direita", rightArm.getCurrentPosition());
+        telemetry.addData("Destino",arm_positionR);
+        telemetry.addData("Erro Direita",errorR);
+        telemetry.addData("erro esquerda",errorL);
         telemetry.addData("Velocidade",armVelocityR);
         telemetry.update();
 
