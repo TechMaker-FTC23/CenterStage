@@ -10,7 +10,8 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class Arm {
 
-    public double armEncoder = 900;
+    public double armEncoder = 1000;
+    public double climberPosition = 800;
     public double arm_positionR = 0;
     public double arm_positionL = 0;
     public double errorR = 0;
@@ -43,39 +44,53 @@ public class Arm {
         arm_positionR = armEncoder;
     }
 
+    public void climberPosition(){
+        arm_positionL = climberPosition;
+        arm_positionR = climberPosition;
+        leftArm.setTargetPosition((int)arm_positionL);
+        rightArm.setTargetPosition((int)arm_positionR);
+    }
+
     public void reverse() {
         arm_positionL = 0;
         arm_positionR = 0;
+        leftArm.setTargetPosition((int)arm_positionL);
+        rightArm.setTargetPosition((int)arm_positionR);
     }
     public void resetArmEncoders(){
         rightArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        leftArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightArm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftArm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
-    public void task(Telemetry telemetry){
+    public void task(){
         //calculo PID do braço;
-            //errorL = arm_positionL - leftArm.getCurrentPosition();
-            //errorR = arm_positionR - rightArm.getCurrentPosition();
-            leftArm.setTargetPosition((int)arm_positionL);
-            rightArm.setTargetPosition((int)arm_positionR);
-            //armVelocityL = errorL * kP;
-            //armVelocityR = errorR * kP;
-            if(arm_positionL==0)
-                armVelocityL = -0.3;
-            else
-                armVelocityL = 0.7;
-            leftArm.setPower(armVelocityL);
-            rightArm.setPower(armVelocityL);
 
-        telemetry.addData("Atual", getCurrentArmPosition());
+            if(arm_positionL==0) {
+                armVelocityL = -0.6;
+                armVelocityR = armVelocityL;
+                if(leftArm.getCurrentPosition()<10)
+                    armVelocityL = 0;
+                if(rightArm.getCurrentPosition()<10)
+                    armVelocityR = 0;
+            }
+            else {
+                errorL = arm_positionL - leftArm.getCurrentPosition();
+                errorR = arm_positionR - rightArm.getCurrentPosition();
+                armVelocityL = errorL * kP;
+                armVelocityR = errorR * kP;
+            }
+            leftArm.setPower(armVelocityL);
+            rightArm.setPower(armVelocityR);
+
+        /*telemetry.addData("Atual", getCurrentArmPosition());
         telemetry.addData("Atual Esquerda", leftArm.getCurrentPosition());
         telemetry.addData("Atual Direita", rightArm.getCurrentPosition());
         telemetry.addData("Destino",arm_positionR);
         telemetry.addData("Erro Direita",errorR);
         telemetry.addData("erro esquerda",errorL);
         telemetry.addData("Velocidade",armVelocityR);
-        telemetry.update();
+        telemetry.update();*/
 
 
     }

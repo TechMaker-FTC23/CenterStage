@@ -33,15 +33,17 @@ public class TechMakerTeleop extends LinearOpMode {
 
         Claw claw = new Claw(hardwareMap);
 
-        arm.resetArmEncoders();
         waitForStart();
+        arm.resetArmEncoders();
 
 
         while (!isStopRequested()) {
 
-            mecanumVelocity =1;// (5500 - arm.getCurrentArmPosition()) / 4500.0;
+            mecanumVelocity = (5500 - arm.getCurrentArmPosition()) / 5600.0;
             drive.setWeightedDrivePower(
                     new Pose2d(-gamepad1.left_stick_y * mecanumVelocity, -gamepad1.left_stick_x * mecanumVelocity, -gamepad1.right_stick_x * mecanumVelocity));
+
+
 
             //Arm
             if(gamepad1.left_trigger>0.75){
@@ -50,33 +52,36 @@ public class TechMakerTeleop extends LinearOpMode {
             if (gamepad1.right_trigger>0.73) {
                 arm.reverse();
             }
-            arm.task(telemetry);
+            arm.task();
 
-            //Intake
-            if (gamepad1.x){
+            //Intake  claw
+            if (gamepad1.right_bumper){
+                claw.open();
                 intake.activate();
             }
             else if (gamepad1.a){
-                intake.reverse();
+                intake.close();
             }
             else{
+                claw.close();
                 intake.stop();
+
             }
 
+            if (gamepad1.left_bumper){
+                claw.open();
+                sleep(500);
+            }
             //Climber
             if (gamepad1.y){
                 climber.activate();
             }
-            else {
+            else if(gamepad1.dpad_up) {
+                climber.reverse();
+            }else{
                 climber.stop();
             }
-            //Claw
-            if (gamepad1.right_bumper){
-                claw.activate();
-            }
-            if (gamepad1.left_bumper){
-                claw.reverse();
-            }
+
 
             //Launcher
             if (gamepad1.b){
@@ -87,10 +92,6 @@ public class TechMakerTeleop extends LinearOpMode {
             if (gamepad1.back){
                 arm.resetArmEncoders();
             }
-
-
-
-
         }
 
     }

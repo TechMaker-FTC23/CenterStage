@@ -14,10 +14,10 @@ public class Claw {
         claw = hardwareMap.servo.get("claw");
     }
 
-    public void activate(){
+    public void close(){
         claw.setPosition(clawOpenPosition);
     }
-    public void reverse(){
+    public void open(){
         claw.setPosition(clawClosedPosition);
     }
 

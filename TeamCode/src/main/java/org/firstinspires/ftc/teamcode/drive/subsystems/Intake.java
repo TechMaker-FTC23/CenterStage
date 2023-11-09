@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.drive.subsystems;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Intake {
@@ -15,11 +14,10 @@ public class Intake {
 
 
 
-        public void activate(){
-            intakeMotor.setPower(0.7);
-        }
-        public void reverse(){
-            intakeMotor.setPower(-0.7);
+        public void activate(){intakeMotor.setPower(1);}
+
+        public void close(){
+            intakeMotor.setPower(-1);
         }
 
         public void stop(){

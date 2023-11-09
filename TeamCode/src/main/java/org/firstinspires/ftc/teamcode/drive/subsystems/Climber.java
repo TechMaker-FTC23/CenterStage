@@ -14,8 +14,10 @@ public class Climber {
 
     public void activate(){
         climberMotor.setPower(1);
-
 }
+    public void reverse(){
+        climberMotor.setPower(-1);
+    }
 
     public void stop(){
         climberMotor.setPower(0);
