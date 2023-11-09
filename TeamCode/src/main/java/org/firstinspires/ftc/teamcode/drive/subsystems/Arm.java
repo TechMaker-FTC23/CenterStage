@@ -11,7 +11,8 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class Arm {
 
     public double armEncoder = 1000;
-    public double climberPosition = 800;
+    public double climberPosition2 = 10;
+    public double endGamePosition = 690;
     public double arm_positionR = 0;
     public double arm_positionL = 0;
     public double errorR = 0;
@@ -38,17 +39,20 @@ public class Arm {
         double leftArmPosition = leftArm.getCurrentPosition();
         return (rightArmPosition + leftArmPosition) / 2.0; //
     }
-
     public void activate() {
         arm_positionL = armEncoder;
         arm_positionR = armEncoder;
     }
 
-    public void climberPosition(){
-        arm_positionL = climberPosition;
-        arm_positionR = climberPosition;
-        leftArm.setTargetPosition((int)arm_positionL);
-        rightArm.setTargetPosition((int)arm_positionR);
+    //posição de launcher
+    public void endGame(){
+        arm_positionL = endGamePosition;
+        arm_positionR = endGamePosition;
+    }
+
+    public void setClimberPosition2(){
+        arm_positionR = climberPosition2;
+        arm_positionL = climberPosition2;
     }
 
     public void reverse() {
@@ -73,8 +77,14 @@ public class Arm {
                     armVelocityL = 0;
                 if(rightArm.getCurrentPosition()<10)
                     armVelocityR = 0;
-            }
-            else {
+            }else if(arm_positionL==10) {
+                armVelocityL = -0.2;
+                armVelocityR = armVelocityL;
+                if (leftArm.getCurrentPosition() < 10)
+                    armVelocityL = 0;
+                if (rightArm.getCurrentPosition() < 10)
+                    armVelocityR = 0;
+                }else {
                 errorL = arm_positionL - leftArm.getCurrentPosition();
                 errorR = arm_positionR - rightArm.getCurrentPosition();
                 armVelocityL = errorL * kP;

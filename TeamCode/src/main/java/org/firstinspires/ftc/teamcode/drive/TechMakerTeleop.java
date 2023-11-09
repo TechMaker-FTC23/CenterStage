@@ -43,14 +43,15 @@ public class TechMakerTeleop extends LinearOpMode {
             drive.setWeightedDrivePower(
                     new Pose2d(-gamepad1.left_stick_y * mecanumVelocity, -gamepad1.left_stick_x * mecanumVelocity, -gamepad1.right_stick_x * mecanumVelocity));
 
-
-
             //Arm
             if(gamepad1.left_trigger>0.75){
                 arm.activate();
             }
             if (gamepad1.right_trigger>0.73) {
                 arm.reverse();
+            }
+            if(gamepad1.dpad_right){
+                arm.endGame();
             }
             arm.task();
 
@@ -65,23 +66,23 @@ public class TechMakerTeleop extends LinearOpMode {
             else{
                 claw.close();
                 intake.stop();
-
             }
 
             if (gamepad1.left_bumper){
                 claw.open();
                 sleep(500);
             }
+
             //Climber
             if (gamepad1.y){
                 climber.activate();
+                arm.setClimberPosition2();
             }
             else if(gamepad1.dpad_up) {
                 climber.reverse();
             }else{
                 climber.stop();
             }
-
 
             //Launcher
             if (gamepad1.b){
@@ -93,6 +94,5 @@ public class TechMakerTeleop extends LinearOpMode {
                 arm.resetArmEncoders();
             }
         }
-
     }
 }
