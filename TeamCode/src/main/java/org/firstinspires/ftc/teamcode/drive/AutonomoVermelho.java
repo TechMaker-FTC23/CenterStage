@@ -16,13 +16,13 @@ import org.firstinspires.ftc.teamcode.drive.subsystems.TwoWheelTrackingLocalizer
 
 
 @Autonomous(group="drive")
-public class TechMakerAutonomo extends LinearOpMode {
+public class AutonomoVermelho extends LinearOpMode {
 
     TwoWheelTrackingLocalizer localizer;
 
     @Override
     public void runOpMode() throws InterruptedException {
-        double speed = 0.4;
+        double speed = 0.3;
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         Intake intake = new Intake(hardwareMap);
         Arm arm = new Arm(hardwareMap);
@@ -37,20 +37,20 @@ public class TechMakerAutonomo extends LinearOpMode {
         drive.resetHeading();
         drive.resetEncoder();
         Waypoints[] waypoints = {
-
-                new Waypoints(0, 0, 0, true, false, false, false, 500),
+                new Waypoints(0, 50, 0, false, false, false, false, 50),
                 new Waypoints(0, 0, 0, false, false, false, false, 50),
-                new Waypoints(20, 0, 0, false, false, false, false, 50),
-                new Waypoints(0, 0, 0, false, true, false, false, 500),
-                new Waypoints(0, 0, 0, false, false, false, false, 50),
-                new Waypoints(0, 80, 0, false, false, false, false, 50),
+                new Waypoints(45, 0, 0, false, false, false, false, 50),
                 new Waypoints(0, 0, 0, false, false, true, false, 2500),
-                new Waypoints(0, 20, 0, false, false, true, false, 50),
+                new Waypoints(0,0,0,false,false,true,true,500),
+                new Waypoints(0,0,0,false,false,false,false,2000),
+                /*new Waypoints(0, 20, 0, false, false, true, false, 50),
                 new Waypoints(0, 0, 0, false, false, true, true, 500),
                 new Waypoints(0, 0, 0, false, false, false, true, 2500),
                 new Waypoints(0, -20, 0, false, false, false, true, 50),
                 new Waypoints(-20, 0, 0, false, false, false, true, 50),
                 new Waypoints(0, 40, 0, false, false, false, true, 50)
+
+                 */
         };
 
         while (!isStopRequested()) {
@@ -122,6 +122,7 @@ public class TechMakerAutonomo extends LinearOpMode {
             break;
         }
         while (!isStopRequested()) {
+            arm.task();
         }
 
         }
