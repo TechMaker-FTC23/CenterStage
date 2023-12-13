@@ -5,20 +5,25 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class Claw {
 
-    private final double clawClosedPosition = 1.0;
-    private final double clawOpenPosition = 0.5;
+    private final double clawOpenPosition = 0.8;
+    private final double clawClosedPosition = 0.2;
 
-    private Servo claw;
+    private Servo clawLeft;
+    private Servo clawRight;
 
     public Claw(HardwareMap hardwareMap){
-        claw = hardwareMap.servo.get("claw");
+        clawRight = hardwareMap.servo.get("clawRight");
+        clawLeft = hardwareMap.servo.get("clawLeft");
     }
 
     public void close(){
-        claw.setPosition(clawOpenPosition);
+        clawLeft.setPosition(clawClosedPosition);
+        clawRight.setPosition(1.0 - clawClosedPosition);
     }
+
     public void open(){
-        claw.setPosition(clawClosedPosition);
+        clawLeft.setPosition(clawOpenPosition);
+        clawRight.setPosition(1.0 - clawOpenPosition);
     }
 
 }

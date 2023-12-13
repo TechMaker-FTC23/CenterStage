@@ -1,16 +1,11 @@
 package org.firstinspires.ftc.teamcode.drive.subsystems;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
-
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
+public class Elevator {
 
-
-public class Arm {
-
-    public double armEncoder = 1000;
+    public double armEncoder = 484.5;
     public double climberPosition2 = 10;
     public double endGamePosition = 690;
     public double arm_positionR = 0;
@@ -22,12 +17,12 @@ public class Arm {
     public double armVelocityL = 0;
     private DcMotor leftArm, rightArm;
 
-    public Arm(HardwareMap hmap) {
+    public Elevator(HardwareMap hmap) {
         leftArm = hmap.dcMotor.get("leftArm");
         rightArm = hmap.dcMotor.get("rightArm");
 
         leftArm.setDirection(DcMotor.Direction.FORWARD);
-        rightArm.setDirection(DcMotor.Direction.FORWARD);
+        rightArm.setDirection(DcMotor.Direction.REVERSE);
 
         leftArm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightArm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -44,15 +39,22 @@ public class Arm {
         arm_positionR = armEncoder;
     }
 
-    //posição de launcher
-    public void endGame(){
-        arm_positionL = endGamePosition;
-        arm_positionR = endGamePosition;
+    public void teste(){
+    while(getCurrentArmPosition()<200){
+        leftArm.setPower(0.7);
+        rightArm.setPower(0.7);
+    }
+    leftArm.setPower(0);
+    rightArm.setPower(0);
     }
 
-    public void setClimberPosition2(){
-        arm_positionR = climberPosition2;
-        arm_positionL = climberPosition2;
+    public void voltaTeste() {
+        while (getCurrentArmPosition() > 0) {
+            leftArm.setPower(-0.4);
+            rightArm.setPower(-0.4);
+        }
+        leftArm.setPower(0);
+        rightArm.setPower(0);
     }
 
     public void reverse() {
@@ -70,14 +72,14 @@ public class Arm {
     public void task(){
         //calculo PID do braço;
 
-            if(arm_positionL==0) {
+            if(arm_positionL==0 && arm_positionR==0) {
                 armVelocityL = -0.6;
                 armVelocityR = armVelocityL;
                 if(leftArm.getCurrentPosition()<10)
                     armVelocityL = 0;
                 if(rightArm.getCurrentPosition()<10)
                     armVelocityR = 0;
-            }else if(arm_positionL==10) {
+            }else if(arm_positionL==10 && arm_positionR==10) {
                 armVelocityL = -0.2;
                 armVelocityR = armVelocityL;
                 if (leftArm.getCurrentPosition() < 10)
@@ -89,9 +91,10 @@ public class Arm {
                 errorR = arm_positionR - rightArm.getCurrentPosition();
                 armVelocityL = errorL * kP;
                 armVelocityR = errorR * kP;
+
+                leftArm.setPower(armVelocityL);
+                rightArm.setPower(armVelocityR);
             }
-            leftArm.setPower(armVelocityL);
-            rightArm.setPower(armVelocityR);
 
         /*telemetry.addData("Atual", getCurrentArmPosition());
         telemetry.addData("Atual Esquerda", leftArm.getCurrentPosition());
