@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.teamcode.drive.subsystems.Arm;
+import org.firstinspires.ftc.teamcode.drive.subsystems.Elevator;
 import org.firstinspires.ftc.teamcode.drive.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.drive.subsystems.Climber;
 import org.firstinspires.ftc.teamcode.drive.subsystems.Intake;
@@ -25,7 +25,7 @@ public class AutonomoVermelho extends LinearOpMode {
         double speed = 0.3;
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         Intake intake = new Intake(hardwareMap);
-        Arm arm = new Arm(hardwareMap);
+        Elevator arm = new Elevator(hardwareMap);
         Climber climber = new Climber(hardwareMap);
         Launcher launcher = new Launcher(hardwareMap);
         Claw claw = new Claw(hardwareMap);
