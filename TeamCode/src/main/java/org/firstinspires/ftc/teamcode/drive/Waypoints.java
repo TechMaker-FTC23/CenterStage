@@ -6,17 +6,17 @@ public class Waypoints {
     public double heading;
     public boolean actIntake;
     public boolean actReverse;
-    public boolean extendArm;
+    public boolean extendElevator;
     public boolean openClaw;
     public int timeout;
     public Waypoints(double x,double y, double heading, boolean actIntake, boolean actReverse,
-    boolean extendArm, boolean openClaw,  int timeout){
+    boolean extendElevator, boolean openClaw,  int timeout){
         this.x = x;
         this.y = y;
         this.heading = heading;
         this.actIntake = actIntake;
         this.actReverse = actReverse;
-        this.extendArm = extendArm;
+        this.extendElevator = extendElevator;
         this.openClaw = openClaw;
         this.timeout = timeout;
     }

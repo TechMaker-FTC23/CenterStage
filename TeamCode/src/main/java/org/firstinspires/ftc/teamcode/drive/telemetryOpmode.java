@@ -15,7 +15,7 @@ public class telemetryOpmode extends LinearOpMode {
         Elevator arm = new Elevator(hardwareMap);
 
         waitForStart();
-        arm.resetArmEncoders();
+        arm.resetElevatorEncoders();
 
 
         while (!isStopRequested()) {

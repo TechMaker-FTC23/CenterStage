@@ -65,7 +65,7 @@ public class AutonomoTeste extends LinearOpMode {
         double midavgfin;
         Mat output = new Mat();
         Scalar rectColor = new Scalar(0.0, 0.0, 255.0);
-        //função proscess frame, irá detectar a localização geral de um objeto
+        //função proscessFrame, irá detectar a localização geral de um objeto
         public Mat processFrame(Mat input){
             // e dividir o nosso espaço de vizualização em 3 quadrantes
             //parametros de altura e largura de cada quadrante
@@ -107,16 +107,21 @@ public class AutonomoTeste extends LinearOpMode {
                 //objeto está sendo identificado
                 telemetry.addLine("Esquerda");
                 linha = "Esquerda";
+                // movimentação
             } else if (rightavgfin > midavgfin){
                 telemetry.addLine("Direita");
                 linha = "Direita";
+                //movimentação
             } else{
                 telemetry.addLine("Meio");
                 linha = "Meio";
+                //movimentação:
             }
 
             return (output);
         }
+
     }
+
 
 }

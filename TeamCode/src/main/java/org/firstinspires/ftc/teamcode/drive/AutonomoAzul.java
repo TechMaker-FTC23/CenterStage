@@ -25,7 +25,7 @@ public class AutonomoAzul extends LinearOpMode {
         double speed = 0.3;
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         Intake intake = new Intake(hardwareMap);
-        Elevator arm = new Elevator(hardwareMap);
+        Elevator elevator = new Elevator(hardwareMap);
         Climber climber = new Climber(hardwareMap);
         Launcher launcher = new Launcher(hardwareMap);
         Claw claw = new Claw(hardwareMap);
@@ -33,24 +33,17 @@ public class AutonomoAzul extends LinearOpMode {
         localizer = new TwoWheelTrackingLocalizer(hardwareMap,drive);
 
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        arm.resetArmEncoders();
+        elevator.resetElevatorEncoders();
         drive.resetHeading();
         drive.resetEncoder();
         Waypoints[] waypoints = {
                 new Waypoints(0, 50, 0, false, false, false, false, 50),
                 new Waypoints(0, 0, 0, false, false, false, false, 50),
-                new Waypoints(-45, 0, 0, false, false, false, false, 50),
+                new Waypoints(0, 0, 0, false, false, false, false, 50),
                 new Waypoints(0, 0, 0, false, false, true, false, 2500),
                 new Waypoints(0,0,0,false,false,true,true,500),
                 new Waypoints(0,0,0,false,false,false,false,2000),
-                /*new Waypoints(0, 20, 0, false, false, true, false, 50),
-                new Waypoints(0, 0, 0, false, false, true, true, 500),
-                new Waypoints(0, 0, 0, false, false, false, true, 2500),
-                new Waypoints(0, -20, 0, false, false, false, true, 50),
-                new Waypoints(-20, 0, 0, false, false, false, true, 50),
-                new Waypoints(0, 40, 0, false, false, false, true, 50)
 
-                 */
         };
 
         while (!isStopRequested()) {
@@ -62,14 +55,14 @@ public class AutonomoAzul extends LinearOpMode {
                 Waypoints w =  waypoints[idx];
                 drive.resetEncoder();
 
-                if(arm.arm_positionR>10)
+                if(elevator.elevator_positionR>10)
                     drive.setLimiterAuto(0.1);
                 else
                     drive.setLimiterAuto(0.4);
                 if(w.x<0)
-                    drive.setWeightedDrivePowerAuto(new Pose2d(0, -speed, 0));
+                    drive.setWeightedDrivePowerAuto(new Pose2d(-speed, 0, 0));
                 else
-                    drive.setWeightedDrivePowerAuto(new Pose2d(0, speed, 0));
+                    drive.setWeightedDrivePowerAuto(new Pose2d(speed, 0, 0));
 
                 while(Math.abs(localizer.getPerpendicularPosition())<Math.abs( w.x)) {
                     drive.update();
@@ -77,18 +70,18 @@ public class AutonomoAzul extends LinearOpMode {
                 }
 
                 if(w.y<0)
-                    drive.setWeightedDrivePowerAuto(new Pose2d(-speed,0, 0));
+                    drive.setWeightedDrivePowerAuto(new Pose2d(0,-speed, 0));
                 else
-                    drive.setWeightedDrivePowerAuto(new Pose2d(speed,0, 0));
+                    drive.setWeightedDrivePowerAuto(new Pose2d(0,speed, 0));
 
                 while(Math.abs(localizer.getParallelPosition())<Math.abs( w.y)) {
                     drive.update();
                     updateTelemetry();
                 }
-                /*drive.setWeightedDrivePower(new Pose2d( 0, 0,speed));
+                drive.setWeightedDrivePower(new Pose2d( 0, 0,speed));
                 while(localizer.getHeading()>w.heading) {
                     updateTelemetry();
-                }*/
+                }
                 updateTelemetry();
                 drive.setWeightedDrivePowerAuto(new Pose2d(0, 0, 0));
                 if(w.actIntake){
@@ -100,11 +93,11 @@ public class AutonomoAzul extends LinearOpMode {
                 else{
                     intake.stop();
                 }
-                if(w.extendArm){
-                    arm.activate();
+                if(w.extendElevator){
+                    elevator.activate();
                 }
                 else{
-                    arm.reverse();
+                    elevator.reverse();
                 }
                 if(w.openClaw){
                     claw.open();
@@ -114,7 +107,7 @@ public class AutonomoAzul extends LinearOpMode {
                 }
                 for (int i =0; i<(w.timeout/10);i++){
                     sleep(1);
-                    arm.task();
+                    elevator.task();
                     updateTelemetry();
                 }
             }
@@ -122,7 +115,7 @@ public class AutonomoAzul extends LinearOpMode {
             break;
         }
         while (!isStopRequested()) {
-            arm.task();
+            elevator.task();
         }
 
     }

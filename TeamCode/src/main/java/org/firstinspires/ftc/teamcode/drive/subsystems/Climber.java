@@ -10,10 +10,14 @@ public class Climber {
         climberMotor = hmap.dcMotor.get("climber");
 
         climberMotor.setDirection(DcMotor.Direction.FORWARD);
+        climberMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public void activate(){
-        climberMotor.setPower(1);
+        while (climberMotor.getCurrentPosition()<400){
+            climberMotor.setPower(0.7);
+        }
+
 }
     public void reverse(){
         climberMotor.setPower(-1);

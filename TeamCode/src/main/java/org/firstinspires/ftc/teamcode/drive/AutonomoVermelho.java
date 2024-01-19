@@ -33,7 +33,7 @@ public class AutonomoVermelho extends LinearOpMode {
         localizer = new TwoWheelTrackingLocalizer(hardwareMap,drive);
 
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        arm.resetArmEncoders();
+        arm.resetElevatorEncoders();
         drive.resetHeading();
         drive.resetEncoder();
         Waypoints[] waypoints = {
@@ -62,7 +62,7 @@ public class AutonomoVermelho extends LinearOpMode {
                 Waypoints w =  waypoints[idx];
                 drive.resetEncoder();
 
-                if(arm.arm_positionR>10)
+                if(arm.elevator_positionR>10)
                     drive.setLimiterAuto(0.1);
                 else
                     drive.setLimiterAuto(0.4);
@@ -100,7 +100,7 @@ public class AutonomoVermelho extends LinearOpMode {
                 else{
                     intake.stop();
                 }
-                if(w.extendArm){
+                if(w.extendElevator){
                     arm.activate();
                 }
                 else{

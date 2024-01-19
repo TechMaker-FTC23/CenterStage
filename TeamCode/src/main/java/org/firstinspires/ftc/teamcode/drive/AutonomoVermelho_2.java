@@ -24,23 +24,23 @@ public class AutonomoVermelho_2 extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         double speed = 0.3;
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-        Intake intake = new Intake(hardwareMap);
-        Elevator arm = new Elevator(hardwareMap);
-        Climber climber = new Climber(hardwareMap);
-        Launcher launcher = new Launcher(hardwareMap);
-        Claw claw = new Claw(hardwareMap);
+        //Intake intake = new Intake(hardwareMap);
+        //Elevator arm = new Elevator(hardwareMap);
+        //Climber climber = new Climber(hardwareMap);
+        //Launcher launcher = new Launcher(hardwareMap);
+        //Claw claw = new Claw(hardwareMap);
         waitForStart();
         localizer = new TwoWheelTrackingLocalizer(hardwareMap,drive);
 
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        arm.resetArmEncoders();
+        //arm.resetArmEncoders();
         drive.resetHeading();
         drive.resetEncoder();
         Waypoints[] waypoints = {
-                new Waypoints(10, 0, 0, false, false, false, false, 50),
+                new Waypoints(50, 0, 0, false, false, false, false, 50),
                 new Waypoints(0, 0, 0, false, false, false, false, 50),
-                new Waypoints(0,160,0,false,false,false,false,500),
-                new Waypoints(0,0,0,false,false,false,false,500)
+                //new Waypoints(0,160,0,false,false,false,false,500),
+                //new Waypoints(0,0,0,false,false,false,false,500)
 
         };
 
@@ -52,11 +52,11 @@ public class AutonomoVermelho_2 extends LinearOpMode {
                 }
                 Waypoints w =  waypoints[idx];
                 drive.resetEncoder();
-
+/*
                 if(arm.arm_positionR>10)
                     drive.setLimiterAuto(0.1);
-                else
-                    drive.setLimiterAuto(0.4);
+                else*/
+                   // drive.setLimiterAuto(0.4);
                 if(w.x<0)
                     drive.setWeightedDrivePowerAuto(new Pose2d(0, -speed, 0));
                 else
@@ -82,7 +82,7 @@ public class AutonomoVermelho_2 extends LinearOpMode {
                 }*/
                 updateTelemetry();
                 drive.setWeightedDrivePowerAuto(new Pose2d(0, 0, 0));
-                if(w.actIntake){
+                /*if(w.actIntake){
                     intake.activate();
                 }
                 else if(w.actReverse){
@@ -91,6 +91,8 @@ public class AutonomoVermelho_2 extends LinearOpMode {
                 else{
                     intake.stop();
                 }
+
+
                 if(w.extendArm){
                     arm.activate();
                 }
@@ -108,13 +110,18 @@ public class AutonomoVermelho_2 extends LinearOpMode {
                     arm.task();
                     updateTelemetry();
                 }
+
+                 */
             }
 
             break;
         }
+        /*
         while (!isStopRequested()) {
             arm.task();
         }
+
+         */
 
     }
     void updateTelemetry(){
