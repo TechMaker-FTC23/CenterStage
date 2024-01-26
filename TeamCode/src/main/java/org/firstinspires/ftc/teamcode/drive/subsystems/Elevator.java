@@ -16,8 +16,8 @@ public class Elevator {
     private DcMotor leftArm, rightArm;
 
     public Elevator(HardwareMap hmap) {
-        leftArm = hmap.dcMotor.get("leftArm");
-        rightArm = hmap.dcMotor.get("rightArm");
+        leftArm = hmap.dcMotor.get("leftElevator");
+        rightArm = hmap.dcMotor.get("rightElevator");
 
         leftArm.setDirection(DcMotor.Direction.FORWARD);
         rightArm.setDirection(DcMotor.Direction.REVERSE);
