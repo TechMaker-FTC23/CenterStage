@@ -20,12 +20,11 @@ public class TechMakerTeleop extends LinearOpMode {
     public double mecanumVelocity = 0;
 
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode() {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        //FieldOriented fieldOriented = new FieldOriented();
-        //fieldOriented.init(hardwareMap);
+
 
         Intake intake = new Intake(hardwareMap);
 
@@ -39,34 +38,24 @@ public class TechMakerTeleop extends LinearOpMode {
 
         waitForStart();
 
-        elevator.resetElevatorEncoders();
 
         while (!isStopRequested()) {
+            mecanumVelocity =1;
             drive.setWeightedDrivePower(
-                    new Pose2d(-gamepad1.left_stick_y,-gamepad1.left_stick_x,-gamepad1.right_stick_x));
-            /*
-            double y = -gamepad1.left_stick_y;
-            double x = gamepad1.left_stick_x;
-            double rx = gamepad1.right_stick_x;
-
-            // Call the fieldOrientedDrive method from the FieldOriented subsystem
-            fieldOriented.fieldOrientedDrive(y, x, rx);
-
-            if(gamepad1.options){
-                fieldOriented.resetIMU();
-
-             */
-            }
+                    new Pose2d(-gamepad1.left_stick_y * mecanumVelocity, -gamepad1.left_stick_x * mecanumVelocity, -gamepad1.right_stick_x * mecanumVelocity));
 
 
-            //Claw
-            if(gamepad2.right_bumper){
-                claw.close();}
-            else if(gamepad2.left_trigger>50){
-                claw.open();
-            }
+                //intake + Claw
+                if (gamepad2.right_bumper) {
+                    intake.activate();
+                } else if (gamepad2.left_bumper) {
+                    intake.close();
+                } else {
+                    intake.stop();
+                }
 
-            // Elevator
+
+                // Elevator
 
           /*  while (gamepad2.left_trigger>0.5){
                 elevator.activate();
@@ -76,28 +65,14 @@ public class TechMakerTeleop extends LinearOpMode {
             }
 
            */
-
-            //Launcher
+                //Launcher
             /*
             while (gamepad2.a){
                 launcher.activate();
             }
             launcher.stop();
-
-
              */
-            //intake + Claw
-            if(gamepad2.right_bumper){
-                intake.activate();
-            }else{intake.stop();}
-            /*
-            //Climber
-            if(gamepad2.a){
-                climber.activate();
             }
-
-             */
-
         }
     }
 
