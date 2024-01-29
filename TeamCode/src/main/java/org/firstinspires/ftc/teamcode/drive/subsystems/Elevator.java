@@ -5,12 +5,12 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Elevator {
 
-    public double armEncoder = 484.5;
+    public double armEncoder = 1180;
     public double elevator_positionR = 0;
     public double elevator_positionL = 0;
     public double errorR = 0;
     public double errorL = 0;
-    public double kP = 0.001;
+    public double kP = 0.010425781250000002;
     public double armVelocityR = 0;
     public double armVelocityL = 0;
     private DcMotor leftArm, rightArm;
@@ -28,6 +28,17 @@ public class Elevator {
 
     }
 
+    public double right(){
+        double rightPosition = rightArm.getCurrentPosition();
+        return rightPosition;
+    }
+
+    public double left(){
+        double leftPosition = leftArm.getCurrentPosition();
+        return leftPosition;
+    }
+
+
     public double getCurrentArmPosition() {
         double rightArmPosition = rightArm.getCurrentPosition();
         double leftArmPosition = leftArm.getCurrentPosition();
@@ -39,7 +50,7 @@ public class Elevator {
     }
 
     public void teste() {
-        while(getCurrentArmPosition() < 100) {
+        while(leftArm.getCurrentPosition() < 1213 && rightArm.getCurrentPosition()<1182) {
             leftArm.setPower(0.7);
             rightArm.setPower(0.7);
         }
@@ -48,9 +59,9 @@ public class Elevator {
         }
 
     public void voltaTeste() {
-        while (getCurrentArmPosition() > 0) {
-            leftArm.setPower(-0.3);
-            rightArm.setPower(-0.3);
+        while (leftArm.getCurrentPosition() > 0 && rightArm.getCurrentPosition()>0) {
+            leftArm.setPower(-0.5);
+            rightArm.setPower(-0.5);
         }
             leftArm.setPower(0);
             rightArm.setPower(0);

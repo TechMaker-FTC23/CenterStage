@@ -12,16 +12,18 @@ public class telemetryOpmode extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        Elevator arm = new Elevator(hardwareMap);
+        Elevator elevator = new Elevator(hardwareMap);
 
         waitForStart();
-        arm.resetElevatorEncoders();
+        elevator.resetElevatorEncoders();
 
 
         while (!isStopRequested()) {
             telemetry.addData("Left trigger",gamepad1.left_trigger);
             telemetry.addData("Right trigger",gamepad1.right_trigger);
-           telemetry.addData("Encoder Braco",arm.getCurrentArmPosition());
+           telemetry.addData("Encoder Braco",elevator.getCurrentArmPosition());
+           telemetry.addData("esquerdo",elevator.left());
+           telemetry.addData("direita",elevator.right());
            telemetry.update();
 
 

@@ -4,7 +4,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.drive.subsystems.Elevator;
-import org.firstinspires.ftc.teamcode.drive.subsystems.FieldOriented;
 import org.firstinspires.ftc.teamcode.drive.subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.drive.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.drive.subsystems.Claw;
@@ -24,32 +23,28 @@ public class TechMakerTeleop extends LinearOpMode {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-
-
         Intake intake = new Intake(hardwareMap);
 
         Elevator elevator = new Elevator(hardwareMap);
 
-        //Climber climber = new Climber(hardwareMap);
+       // Climber climber = new Climber(hardwareMap);
 
-        //Launcher launcher = new Launcher(hardwareMap);
+       // Launcher launcher = new Launcher(hardwareMap);
 
         Claw claw = new Claw(hardwareMap);
 
+
+        elevator.resetElevatorEncoders();
         waitForStart();
-
-
         while (!isStopRequested()) {
             mecanumVelocity =1;
             drive.setWeightedDrivePower(
                     new Pose2d(-gamepad1.left_stick_y * mecanumVelocity, -gamepad1.left_stick_x * mecanumVelocity, -gamepad1.right_stick_x * mecanumVelocity));
 
 
-                //intake + Claw
-                if (gamepad2.right_bumper) {
+                //intake
+                if (gamepad2.right_trigger>0.5) {
                     intake.activate();
-                } else if (gamepad2.left_bumper) {
-                    intake.close();
                 } else {
                     intake.stop();
                 }
@@ -57,21 +52,33 @@ public class TechMakerTeleop extends LinearOpMode {
 
                 // Elevator
 
-          /*  while (gamepad2.left_trigger>0.5){
-                elevator.activate();
+           /* while (gamepad2.cross){
+                elevator.teste();
             }
-            while (gamepad2.right_trigger>0.5){
-                elevator.reverse();
+            while (gamepad2.square){
+                elevator.voltaTeste();
             }
 
-           */
-                //Launcher
-            /*
-            while (gamepad2.a){
-                launcher.activate();
+            */
+
+
+           // elevator.task();
+
+            //claw
+            if(gamepad2.left_bumper){
+                claw.openLeft();
+            }else if (gamepad2.right_bumper){
+                claw.openRight();
+            }else if (gamepad2.left_trigger>0.5){
+                claw.close();
             }
-            launcher.stop();
-             */
+
+            if(gamepad2.square){
+                claw.finalPosition();
+            }else{
+                claw.initialPosition();
+            }
+
             }
         }
     }
