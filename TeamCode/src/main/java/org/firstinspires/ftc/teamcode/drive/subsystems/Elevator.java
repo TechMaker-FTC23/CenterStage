@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.drive.subsystems;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 public class Elevator {
 
@@ -15,7 +16,16 @@ public class Elevator {
     public double armVelocityL = 0;
     private DcMotor leftArm, rightArm;
 
+    private final double clawInitialPosition = 0.5;
+    private final double clawFinalPosition = 1.0;
+
+    private Servo leftServo;
+    private Servo rightServo;
+
     public Elevator(HardwareMap hmap) {
+        leftServo = hmap.servo.get("left");
+        rightServo = hmap.servo.get("right");
+
         leftArm = hmap.dcMotor.get("leftElevator");
         rightArm = hmap.dcMotor.get("rightElevator");
 
@@ -24,8 +34,6 @@ public class Elevator {
 
         leftArm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightArm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-
     }
 
     public double right(){
@@ -49,23 +57,39 @@ public class Elevator {
         elevator_positionR = armEncoder;
     }
 
-    public void teste() {
-        while(leftArm.getCurrentPosition() < 1213 && rightArm.getCurrentPosition()<1182) {
-            leftArm.setPower(0.7);
-            rightArm.setPower(0.7);
-        }
-            leftArm.setPower(0);
-            rightArm.setPower(0);
+    public void clawPosition(){
+        if(getCurrentArmPosition()>900){
+            leftServo.setPosition(clawFinalPosition);
+            rightServo.setPosition(1.0 - clawFinalPosition);
+            }else{
+            leftServo.setPosition(clawInitialPosition);
+            rightServo.setPosition(1.0 - clawInitialPosition);
+            }
         }
 
-    public void voltaTeste() {
-        while (leftArm.getCurrentPosition() > 0 && rightArm.getCurrentPosition()>0) {
-            leftArm.setPower(-0.5);
-            rightArm.setPower(-0.5);
+
+    public boolean finalPosition() {
+        if(leftArm.getCurrentPosition() < 1213 && rightArm.getCurrentPosition()<1182) {
+            leftArm.setPower(0.7);
+            rightArm.setPower(0.7);
+            return false;
         }
             leftArm.setPower(0);
             rightArm.setPower(0);
+            return true;
         }
+
+    public boolean initialPosition() {
+        if (leftArm.getCurrentPosition() > 0 && rightArm.getCurrentPosition() > 0) {
+            leftArm.setPower(-0.5);
+            rightArm.setPower(-0.5);
+            return false;
+        } else {
+            leftArm.setPower(0);
+            rightArm.setPower(0);
+            return true;
+        }
+    }
 
     public void reverse() {
         elevator_positionR = 0;

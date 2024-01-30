@@ -17,7 +17,13 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 @TeleOp(group="drive")
 public class TechMakerTeleop extends LinearOpMode {
     public double mecanumVelocity = 0;
-
+    /*
+     0 - Em baixo
+     1 - Subindo
+     2 - Em cima
+     3 - Descendo
+     */
+    public int elevatorState = 0;
     @Override
     public void runOpMode() {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
@@ -52,31 +58,37 @@ public class TechMakerTeleop extends LinearOpMode {
 
                 // Elevator
 
-           /* while (gamepad2.cross){
-                elevator.teste();
+            if(gamepad2.square){
+                elevatorState = 1;
+
             }
-            while (gamepad2.square){
-                elevator.voltaTeste();
+            if (gamepad2.cross){
+                elevatorState = 3;
+
             }
 
-            */
-
+            if(elevatorState==1){
+                if(elevator.finalPosition()) {
+                    elevatorState = 2;
+                }
+            }
+            if(elevatorState==3){
+                if(elevator.initialPosition()){
+                    elevatorState = 0;
+                }
+            }
+            elevator.clawPosition();
 
            // elevator.task();
 
             //claw
             if(gamepad2.left_bumper){
                 claw.openLeft();
-            }else if (gamepad2.right_bumper){
+            }
+            if (gamepad2.right_bumper){
                 claw.openRight();
             }else if (gamepad2.left_trigger>0.5){
                 claw.close();
-            }
-
-            if(gamepad2.square){
-                claw.finalPosition();
-            }else{
-                claw.initialPosition();
             }
 
             }
