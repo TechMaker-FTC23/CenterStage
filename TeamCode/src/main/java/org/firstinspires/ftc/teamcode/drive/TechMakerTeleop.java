@@ -24,6 +24,7 @@ public class TechMakerTeleop extends LinearOpMode {
      3 - Descendo
      */
     public int elevatorState = 0;
+
     @Override
     public void runOpMode() {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
@@ -33,9 +34,9 @@ public class TechMakerTeleop extends LinearOpMode {
 
         Elevator elevator = new Elevator(hardwareMap);
 
-       // Climber climber = new Climber(hardwareMap);
+        // Climber climber = new Climber(hardwareMap);
 
-       // Launcher launcher = new Launcher(hardwareMap);
+        Launcher launcher = new Launcher(hardwareMap);
 
         Claw claw = new Claw(hardwareMap);
 
@@ -43,55 +44,60 @@ public class TechMakerTeleop extends LinearOpMode {
         elevator.resetElevatorEncoders();
         waitForStart();
         while (!isStopRequested()) {
-            mecanumVelocity =1;
+            mecanumVelocity = 1;
             drive.setWeightedDrivePower(
                     new Pose2d(-gamepad1.left_stick_y * mecanumVelocity, -gamepad1.left_stick_x * mecanumVelocity, -gamepad1.right_stick_x * mecanumVelocity));
 
 
-                //intake
-                if (gamepad2.right_trigger>0.5) {
-                    intake.activate();
-                } else {
-                    intake.stop();
-                }
+            //intake
+            if (gamepad2.right_trigger > 0.5) {
+                intake.activate();
+            } else {
+                intake.stop();
+            }
 
 
-                // Elevator
+            // Elevator
 
-            if(gamepad2.square){
+            if (gamepad2.square) {
                 elevatorState = 1;
 
             }
-            if (gamepad2.cross){
+            if (gamepad2.cross) {
                 elevatorState = 3;
 
             }
 
-            if(elevatorState==1){
-                if(elevator.finalPosition()) {
+            if (elevatorState == 1) {
+                if (elevator.finalPosition()) {
                     elevatorState = 2;
                 }
             }
-            if(elevatorState==3){
-                if(elevator.initialPosition()){
+            if (elevatorState == 3) {
+                if (elevator.initialPosition()) {
                     elevatorState = 0;
                 }
             }
             elevator.clawPosition();
 
-           // elevator.task();
+            // elevator.task();
 
             //claw
-            if(gamepad2.left_bumper){
+            if (gamepad2.left_bumper) {
                 claw.openLeft();
             }
-            if (gamepad2.right_bumper){
+            if (gamepad2.right_bumper) {
                 claw.openRight();
-            }else if (gamepad2.left_trigger>0.5){
+            } else if (gamepad2.left_trigger > 0.5) {
                 claw.close();
             }
 
+            if (gamepad2.dpad_up) {
+                launcher.activate();
+            } else {
+                launcher.stop();
             }
         }
     }
+}
 

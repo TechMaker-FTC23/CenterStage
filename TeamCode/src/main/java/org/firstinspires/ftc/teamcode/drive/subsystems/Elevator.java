@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class Elevator {
 
-    public double armEncoder = 1180;
+    public double armEncoder = 3003.5;
     public double elevator_positionR = 0;
     public double elevator_positionL = 0;
     public double errorR = 0;
@@ -16,8 +16,8 @@ public class Elevator {
     public double armVelocityL = 0;
     private DcMotor leftArm, rightArm;
 
-    private final double clawInitialPosition = 0.5;
-    private final double clawFinalPosition = 1.0;
+    private final double clawInitialPosition = 0.5455;
+    private final double clawFinalPosition = 0.45;
 
     private Servo leftServo;
     private Servo rightServo;
@@ -58,7 +58,7 @@ public class Elevator {
     }
 
     public void clawPosition(){
-        if(getCurrentArmPosition()>900){
+        if(getCurrentArmPosition()>1500){
             leftServo.setPosition(clawFinalPosition);
             rightServo.setPosition(1.0 - clawFinalPosition);
             }else{
@@ -69,26 +69,39 @@ public class Elevator {
 
 
     public boolean finalPosition() {
-        if(leftArm.getCurrentPosition() < 1213 && rightArm.getCurrentPosition()<1182) {
+        boolean ret = true;
+        if (leftArm.getCurrentPosition() < armEncoder) {
             leftArm.setPower(0.7);
-            rightArm.setPower(0.7);
-            return false;
-        }
-            leftArm.setPower(0);
-            rightArm.setPower(0);
-            return true;
-        }
-
-    public boolean initialPosition() {
-        if (leftArm.getCurrentPosition() > 0 && rightArm.getCurrentPosition() > 0) {
-            leftArm.setPower(-0.5);
-            rightArm.setPower(-0.5);
-            return false;
+            ret = false;
         } else {
             leftArm.setPower(0);
-            rightArm.setPower(0);
-            return true;
         }
+        if (rightArm.getCurrentPosition()<armEncoder) {
+            rightArm.setPower(0.7);
+            ret = false;
+        } else {
+            rightArm.setPower(0);
+        }
+
+        return ret;
+    }
+
+    public boolean initialPosition() {
+        boolean ret = true;
+        if (leftArm.getCurrentPosition() >0) {
+            leftArm.setPower(-0.5);
+            ret = false;
+        } else {
+            leftArm.setPower(0);
+        }
+        if (rightArm.getCurrentPosition()>0) {
+            rightArm.setPower(-0.5);
+            ret = false;
+        } else {
+            rightArm.setPower(0);
+        }
+
+        return ret;
     }
 
     public void reverse() {
@@ -130,6 +143,7 @@ public class Elevator {
                 rightArm.setPower(armVelocityR);
             }
 
+            //pedro esteve aqui
         /*telemetry.addData("Atual", getCurrentArmPosition());
         telemetry.addData("Atual Esquerda", leftArm.getCurrentPosition());
         telemetry.addData("Atual Direita", rightArm.getCurrentPosition());

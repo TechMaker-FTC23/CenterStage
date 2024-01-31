@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.drive.subsystems.Elevator;
 import org.firstinspires.ftc.teamcode.drive.subsystems.Claw;
-import org.firstinspires.ftc.teamcode.drive.subsystems.Climber;
 import org.firstinspires.ftc.teamcode.drive.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.drive.subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.drive.subsystems.SampleMecanumDrive;
@@ -26,18 +25,18 @@ public class AutonomoAzul extends LinearOpMode {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         Intake intake = new Intake(hardwareMap);
         Elevator elevator = new Elevator(hardwareMap);
-        Climber climber = new Climber(hardwareMap);
-        Launcher launcher = new Launcher(hardwareMap);
+        //Launcher launcher = new Launcher(hardwareMap);
         Claw claw = new Claw(hardwareMap);
         waitForStart();
         localizer = new TwoWheelTrackingLocalizer(hardwareMap,drive);
 
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        //launcher.stop();
         elevator.resetElevatorEncoders();
         drive.resetHeading();
         drive.resetEncoder();
         Waypoints[] waypoints = {
-                new Waypoints(0, 50, 0, false, false, false, false, 50),
+                new Waypoints(0, 0, 90, false, false, false, false, 50),
                 new Waypoints(0, 0, 0, false, false, false, false, 50),
                 new Waypoints(0, 0, 0, false, false, false, false, 50),
                 new Waypoints(0, 0, 0, false, false, true, false, 2500),
@@ -94,10 +93,10 @@ public class AutonomoAzul extends LinearOpMode {
                     intake.stop();
                 }
                 if(w.extendElevator){
-                    elevator.activate();
+                    elevator.finalPosition();
                 }
                 else{
-                    elevator.reverse();
+                    elevator.initialPosition();
                 }
                 if(w.openClaw){
                     claw.open();
