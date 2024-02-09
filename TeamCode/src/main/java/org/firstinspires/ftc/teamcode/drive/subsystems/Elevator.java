@@ -17,7 +17,7 @@ public class Elevator {
     private DcMotor leftArm, rightArm;
 
     private final double clawInitialPosition = 0.5455;
-    private final double clawFinalPosition = 0.45;
+    private final double clawFinalPosition = 0.36;
 
     private Servo leftServo;
     private Servo rightServo;
@@ -58,7 +58,7 @@ public class Elevator {
     }
 
     public void clawPosition(){
-        if(getCurrentArmPosition()>1500){
+        if(getCurrentArmPosition()>1600){
             leftServo.setPosition(clawFinalPosition);
             rightServo.setPosition(1.0 - clawFinalPosition);
             }else{
@@ -118,6 +118,7 @@ public class Elevator {
     }
     public void task(){
         //calculo PID do braço;
+
 
             if(elevator_positionL==0 && elevator_positionR==0) {
                 armVelocityL = -0.6;

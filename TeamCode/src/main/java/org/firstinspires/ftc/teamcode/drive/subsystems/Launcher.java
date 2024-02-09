@@ -8,7 +8,7 @@ public class Launcher {
         private Servo laucherLeft;
         private Servo launcherRight;
 
-        private final double launchPosition = 0.5;
+        private final double launchPosition = 0.0;
         private final double closed = 1;
 
         public Launcher(HardwareMap hardwareMap){

@@ -7,6 +7,7 @@ import org.firstinspires.ftc.teamcode.drive.subsystems.Elevator;
 import org.firstinspires.ftc.teamcode.drive.subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.drive.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.drive.subsystems.Claw;
+import org.firstinspires.ftc.teamcode.drive.subsystems.FieldOriented;
 import org.firstinspires.ftc.teamcode.drive.subsystems.Climber;
 import org.firstinspires.ftc.teamcode.drive.subsystems.SampleMecanumDrive;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -27,12 +28,15 @@ public class TechMakerTeleop extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-        drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        //SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        //drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        Intake intake = new Intake(hardwareMap);
+        FieldOriented fieldOriented = new FieldOriented();
+        fieldOriented.init(hardwareMap);
 
-        Elevator elevator = new Elevator(hardwareMap);
+       // Intake intake = new Intake(hardwareMap);
+
+       // Elevator elevator = new Elevator(hardwareMap);
 
         // Climber climber = new Climber(hardwareMap);
 
@@ -40,30 +44,40 @@ public class TechMakerTeleop extends LinearOpMode {
 
         Claw claw = new Claw(hardwareMap);
 
-
-        elevator.resetElevatorEncoders();
+        claw.open();
+       // elevator.resetElevatorEncoders();
         waitForStart();
         while (!isStopRequested()) {
-            mecanumVelocity = 1;
-            drive.setWeightedDrivePower(
-                    new Pose2d(-gamepad1.left_stick_y * mecanumVelocity, -gamepad1.left_stick_x * mecanumVelocity, -gamepad1.right_stick_x * mecanumVelocity));
 
+            double y = -gamepad1.left_stick_y;
+            double x = gamepad1.left_stick_x;
+            double rx = gamepad1.right_stick_x;
 
+            fieldOriented.fieldOrientedDrive(y, x, rx);
+
+            if (gamepad1.options) {
+                fieldOriented.resetIMU();
+            }
+           // mecanumVelocity = 1;
+          //  drive.setWeightedDrivePower(
+          //
+            //          new Pose2d(-gamepad1.left_stick_y * mecanumVelocity, -gamepad1.left_stick_x * mecanumVelocity, -gamepad1.right_stick_x * mecanumVelocity));
+
+            /*
             //intake
             if (gamepad2.right_trigger > 0.5) {
                 intake.activate();
-            } else {
-                intake.stop();
+            } else if(gamepad2.dpad_down) {intake.close();}
+                else{intake.stop();
             }
 
-
             // Elevator
-
             if (gamepad2.square) {
                 elevatorState = 1;
 
             }
             if (gamepad2.cross) {
+                claw.open();
                 elevatorState = 3;
 
             }
@@ -80,7 +94,7 @@ public class TechMakerTeleop extends LinearOpMode {
             }
             elevator.clawPosition();
 
-            // elevator.task();
+            elevator.task();
 
             //claw
             if (gamepad2.left_bumper) {
@@ -97,6 +111,7 @@ public class TechMakerTeleop extends LinearOpMode {
             } else {
                 launcher.stop();
             }
+             */
         }
     }
 }
