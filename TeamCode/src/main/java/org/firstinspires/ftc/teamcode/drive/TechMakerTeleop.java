@@ -8,11 +8,16 @@ import org.firstinspires.ftc.teamcode.drive.subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.drive.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.drive.subsystems.Claw;
 import org.firstinspires.ftc.teamcode.drive.subsystems.FieldOriented;
+import org.firstinspires.ftc.teamcode.drive.subsystems.Led;
 import org.firstinspires.ftc.teamcode.drive.subsystems.Climber;
 import org.firstinspires.ftc.teamcode.drive.subsystems.SampleMecanumDrive;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.hardware.Gamepad;
+
+import java.security.Timestamp;
+import java.sql.Time;
+import java.util.Timer;
 
 
 @TeleOp(group="drive")
@@ -31,39 +36,58 @@ public class TechMakerTeleop extends LinearOpMode {
         //SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         //drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+
         FieldOriented fieldOriented = new FieldOriented();
         fieldOriented.init(hardwareMap);
 
-       // Intake intake = new Intake(hardwareMap);
 
-       // Elevator elevator = new Elevator(hardwareMap);
+        Led led = new Led(hardwareMap);
 
-        // Climber climber = new Climber(hardwareMap);
+       Intake intake = new Intake(hardwareMap);
 
-        Launcher launcher = new Launcher(hardwareMap);
+       Elevator elevator = new Elevator(hardwareMap);
 
-        Claw claw = new Claw(hardwareMap);
+      // Launcher launcher = new Launcher(hardwareMap);
 
-        claw.open();
-       // elevator.resetElevatorEncoders();
+       Claw claw = new Claw(hardwareMap);
+
+
+       elevator.resetElevatorEncoders();
+        telemetry.addData("Posicao","Aguardando inicio");
+        telemetry.update();
         waitForStart();
+
+        claw.InitPosition();
+        led.ligaLed();
+        telemetry.addData("Posicao","Iniciado");
+        telemetry.update();
         while (!isStopRequested()) {
+
 
             double y = -gamepad1.left_stick_y;
             double x = gamepad1.left_stick_x;
             double rx = gamepad1.right_stick_x;
 
             fieldOriented.fieldOrientedDrive(y, x, rx);
-
+            telemetry.addData("Y",y);
+            telemetry.addData("X",x);
+            telemetry.addData("RX",rx);
+            telemetry.addData("Tempo", getRuntime());
+            telemetry.update();
             if (gamepad1.options) {
                 fieldOriented.resetIMU();
             }
-           // mecanumVelocity = 1;
-          //  drive.setWeightedDrivePower(
-          //
-            //          new Pose2d(-gamepad1.left_stick_y * mecanumVelocity, -gamepad1.left_stick_x * mecanumVelocity, -gamepad1.right_stick_x * mecanumVelocity));
 
             /*
+            mecanumVelocity = 1;
+            drive.setWeightedDrivePower(
+
+                  new Pose2d(-gamepad1.left_stick_y * mecanumVelocity, -gamepad1.left_stick_x * mecanumVelocity, -gamepad1.right_stick_x * mecanumVelocity));
+
+
+             */
+
+
             //intake
             if (gamepad2.right_trigger > 0.5) {
                 intake.activate();
@@ -72,47 +96,33 @@ public class TechMakerTeleop extends LinearOpMode {
             }
 
             // Elevator
-            if (gamepad2.square) {
-                elevatorState = 1;
 
-            }
-            if (gamepad2.cross) {
-                claw.open();
-                elevatorState = 3;
-
-            }
-
-            if (elevatorState == 1) {
-                if (elevator.finalPosition()) {
-                    elevatorState = 2;
+                if (gamepad2.square) {
+                    elevator.activate();
+                } else if (gamepad2.cross) {
+                    elevator.reverse();
                 }
-            }
-            if (elevatorState == 3) {
-                if (elevator.initialPosition()) {
-                    elevatorState = 0;
-                }
-            }
-            elevator.clawPosition();
+                elevator.task(getRuntime());
 
-            elevator.task();
+            //elevator.task();
 
             //claw
             if (gamepad2.left_bumper) {
-                claw.openLeft();
-            }
+                claw.open();
+                led.ligaLed();
+
+            }else
             if (gamepad2.right_bumper) {
-                claw.openRight();
-            } else if (gamepad2.left_trigger > 0.5) {
                 claw.close();
+                led.desligaLed();
             }
 
-            if (gamepad2.dpad_up) {
-                launcher.activate();
-            } else {
-                launcher.stop();
-            }
-             */
+
+
+        telemetry.addData("braço",elevator.getCurrentArmPosition());
+
         }
     }
+
 }
 

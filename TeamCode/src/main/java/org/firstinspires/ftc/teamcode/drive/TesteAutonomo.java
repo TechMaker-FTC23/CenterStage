@@ -15,110 +15,32 @@ import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 public class TesteAutonomo extends LinearOpMode {
 
     TwoWheelTrackingLocalizer localizer;
-    SampleMecanumDrive drive;
+
 
     @Override
     public void runOpMode() throws InterruptedException {
-        drive = new SampleMecanumDrive(hardwareMap);
-        Claw claw = new Claw(hardwareMap);
+        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+
         waitForStart();
-        localizer = new TwoWheelTrackingLocalizer(hardwareMap, drive);
 
-        drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        drive.resetHeading();
-        drive.resetEncoder();
-        Waypoints[] waypoints = {
-                new Waypoints(0, 0, 0, 0,0,0),
-                new Waypoints(0, 0, 0, 0,0,0),
-                new Waypoints(0, 0, 0, 0,0,0)
-        };
+        while (opModeIsActive() && !isStopRequested()) {
+        if (isStopRequested()) return;
 
-        while (!isStopRequested()) {
-            double speed = 0.5;
 
-            for (int idx = 0; idx < waypoints.length; idx++) {
-                if (isStopRequested()) {
-                    break;
-                }
-                Waypoints w = waypoints[idx];
-                drive.resetEncoder();
+        // Defina a trajetória 1
+        Trajectory trajetoria1 = drive.trajectoryBuilder(new Pose2d(-72, 18, 0))
+                .lineToSplineHeading(new Pose2d(-36, 40, Math.toRadians(90)))
+                .build();
 
-                drive.setLimiterAuto(0.5);
-
-                // Constrói a trajetória para frente usando o valor de forward fornecido no waypoint
-                TrajectoryBuilder trajetoriaFrenteBuilder = drive.trajectoryBuilder(new Pose2d())
-                        .forward(w.foward);
-
-                Trajectory trajetoriaFrente = trajetoriaFrenteBuilder.build();
-
-                if (w.foward > 0) {
-                    drive.followTrajectory(trajetoriaFrente);
-                }
-
-                while (Math.abs(localizer.getPerpendicularPosition()) < Math.abs(w.foward)) {
-                    drive.update();
-                    updateTelemetry(w);
-                }
-
-                // Constrói a trajetória para trás usando o valor de back fornecido no waypoint
-                TrajectoryBuilder trajetoriaTrasBuilder = drive.trajectoryBuilder(new Pose2d())
-                        .back(w.back);
-
-                Trajectory trajetoriaTras = trajetoriaTrasBuilder.build();
-
-                if (w.back > 0) {
-                    drive.followTrajectory(trajetoriaTras);
-                }
-
-                TrajectoryBuilder direitaBuilder = drive.trajectoryBuilder(trajetoriaTras.end())
-                        .strafeLeft(speed);
-
-                Trajectory trajetoriaDireita = direitaBuilder.build();
-
-                if(w.right>0) {
-                    drive.followTrajectory(trajetoriaDireita);
-                }
-
-                TrajectoryBuilder diagonal = drive.trajectoryBuilder(new Pose2d())
-                        .lineToSplineHeading(new Pose2d(speed, speed, speed));
-
-                Trajectory trajetoriaDiagonal = diagonal.build();
-
-                if(w.right>0 && w.foward>0 && w.heading>0){
-                    drive.followTrajectory(trajetoriaDiagonal);
-                }
+        // Siga a trajetória 1
+        drive.followTrajectory(trajetoria1);
 
 
 
+            // Permitir que outros processos do robô sejam executados
+            drive.update();
 
-                while (Math.abs(localizer.getParallelPosition()) < Math.abs(w.back)) {
-                    drive.update();
-                    updateTelemetry(w);
-                }
 
-                while (localizer.getHeading() > w.heading) {
-                    drive.setWeightedDrivePowerAuto(new Pose2d(0, 0, speed));
-                    updateTelemetry(w);
-                }
-                updateTelemetry(w);
-                drive.setWeightedDrivePowerAuto(new Pose2d(0, 0, 0));
-                for (int i =0; i<w.timeout;i++){
-                    sleep(1);
-                    updateTelemetry(w);
-                }
-            }
-            break;
         }
-    }
-
-    void updateTelemetry(Waypoints w){
-        telemetry.addData("Heading",localizer.getHeading());
-        telemetry.addData("Parallel",localizer.getParallelPosition());
-        telemetry.addData("Perpendicular",localizer.getPerpendicularPosition());
-        telemetry.addData("Tempo",w.timeout);
-        telemetry.addData("Waypoint X",w.foward);
-        telemetry.addData("Waypoint Y",w.back);
-        telemetry.addData("Waypoint H",w.heading);
-        telemetry.update();
     }
 }
