@@ -28,6 +28,7 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
@@ -63,7 +64,7 @@ public class SampleMecanumDrive extends MecanumDrive {
     public static double VX_WEIGHT = 1;
     public static double VY_WEIGHT = 1;
     public static double OMEGA_WEIGHT = 1;
-    private double limiterAuto = 0.4;
+    private double limiterAuto = 0.1;
     private TrajectorySequenceRunner trajectorySequenceRunner;
 
     private static final TrajectoryVelocityConstraint VEL_CONSTRAINT = getVelocityConstraint(MAX_VEL, MAX_ANG_VEL, TRACK_WIDTH);
@@ -84,7 +85,7 @@ public class SampleMecanumDrive extends MecanumDrive {
         super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
 
         follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
-                new Pose2d(0.5, 0.5, Math.toRadians(5.0)), 0.5);
+                new Pose2d(0.5, 0.5, Math.toDegrees(5.0)), 0.5);
 
         LynxModuleUtil.ensureMinimumFirmwareVersion(hardwareMap);
 
@@ -260,7 +261,7 @@ public class SampleMecanumDrive extends MecanumDrive {
     public void setLimiterAuto(double limiter){
         limiterAuto = limiter;
     }
-    public void setWeightedDrivePowerAuto(Pose2d drivePower) {
+    public void setWeightedDrivePowerAuto(Pose2d drivePower, Telemetry telemetry) {
         Pose2d vel = drivePower;
 
         if (Math.abs(drivePower.getX()) + Math.abs(drivePower.getY())
@@ -276,16 +277,20 @@ public class SampleMecanumDrive extends MecanumDrive {
                     OMEGA_WEIGHT * drivePower.getHeading()
             ).div(denom);
         }
-        setDrivePowerAuto(vel);
+        setDrivePowerAuto(vel,telemetry);
     }
-    void setDrivePowerAuto( Pose2d robotVel) {
+    void setDrivePowerAuto( Pose2d robotVel, Telemetry telemetry) {
         Double[] powers = {
                 robotVel.getX() - robotVel.getY() - robotVel.getHeading(),
                 robotVel.getX() + robotVel.getY() - robotVel.getHeading(),
                 robotVel.getX() - robotVel.getY() + robotVel.getHeading(),
                 robotVel.getX() + robotVel.getY() + robotVel.getHeading() };
+        for (int i=0;i<4;i++){
+            telemetry.addData("Motor "+i,powers[i]);
+        }
+        telemetry.update();
 
-        setMotorPowers(powers[0]*limiterAuto, powers[1]*limiterAuto, powers[2]*limiterAuto, powers[3]*limiterAuto);
+        setMotorPowersAuto(powers[0]*limiterAuto, powers[1]*limiterAuto, powers[2]*limiterAuto, powers[3]*limiterAuto);
     }
     @NonNull
     @Override
@@ -321,7 +326,12 @@ public class SampleMecanumDrive extends MecanumDrive {
         rightRear.setPower(v2);
         rightFront.setPower(v3);
     }
-
+    public void setMotorPowersAuto(double v, double v1, double v2, double v3) {
+        leftFront.setPower(v);
+        leftRear.setPower(v1);
+        rightRear.setPower(v2);
+        rightFront.setPower(v3);
+    }
     @Override
     public double getRawExternalHeading() {
         return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
@@ -342,6 +352,52 @@ public class SampleMecanumDrive extends MecanumDrive {
     public static TrajectoryAccelerationConstraint getAccelerationConstraint(double maxAccel) {
         return new ProfileAccelerationConstraint(maxAccel);
     }
+
+
+
+    /*
+    public void turnRobot(double degrees, double speedDirection) {
+            // Ler a orientação atual do IMU
+            double currentHeading = getRawExternalHeading();
+
+            // Calcular o ângulo final após a rotação
+            double targetHeading = currentHeading + degrees;
+
+            // Definir a direção do movimento (horário ou anti-horário)
+            int direction = (degrees >= 0) ? 1 : -1;
+
+            // Definir a potência dos motores
+            double motorPower = Math.abs(speedDirection);
+
+            // Girar o robô até atingir o ângulo desejado
+            while (Math.abs(getRawExternalHeading() - targetHeading) > 1.0) {
+                // Calcular a diferença entre a orientação atual e a orientação alvo
+                double headingDiff = targetHeading - getRawExternalHeading();
+
+                // Definir a potência dos motores com base na direção e velocidade
+                double leftPower = motorPower * direction;
+                double rightPower = -motorPower * direction;
+
+
+                // Definir a potência dos motores
+                leftRear.setPower(leftPower);
+                leftFront.setPower(leftPower);
+                rightRear.setPower(rightPower);
+                rightFront.setPower(rightPower);
+
+
+
+            }
+
+            // Parar os motores quando a rotação for concluída
+            leftRear.setPower(0);
+            leftFront.setPower(0);
+            rightRear.setPower(0);
+            rightFront.setPower(0);
+        }
+        */
+
+
     public void resetEncoder(){
         setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         if (RUN_USING_ENCODER) {

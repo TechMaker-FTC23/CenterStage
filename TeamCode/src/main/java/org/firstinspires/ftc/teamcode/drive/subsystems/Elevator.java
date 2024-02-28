@@ -12,8 +12,10 @@ public class Elevator {
 
     private double activationHeight = 3300;
     private double armEncoder = 3490;
-    private double armEncoderLeft = 3569;
-    private double armEncoderRight = 3412;
+    private double armEncoderLeft = 3060;
+    private double armEncoderRight = 3299;
+    private double climbPositionL = 1907;
+    private double climbPositionR = 2131;
     private double elevator_positionR = 0;
     private double elevator_positionL = 0;
     private double errorR = 0;
@@ -35,6 +37,7 @@ public class Elevator {
 
     private Servo leftServo;
     private Servo rightServo;
+    private boolean climbing = false;
 
 
     public Elevator(HardwareMap hmap) {
@@ -105,7 +108,21 @@ public class Elevator {
         return (rightArmPosition + leftArmPosition) / 2.0; //
     }
 
+    public void climber(){
+        elevator_positionR = climbPositionR;
+        elevator_positionL = climbPositionL;
+        leftArm.setTargetPosition((int)elevator_positionL);
+        rightArm.setTargetPosition((int)elevator_positionR);
+    }
+
+    public void desceClimber(){
+        climbing = true;
+        leftArm.setPower(-1);
+        rightArm.setPower(-1);
+    }
+
     public void activate(){
+        climbing = false;
         elevator_positionR = armEncoderRight;
         elevator_positionL = armEncoderLeft;
         leftArm.setTargetPosition((int)elevator_positionL);
@@ -113,6 +130,7 @@ public class Elevator {
     }
 
     public void reverse() {
+        climbing = false;
         elevator_positionR = 0;
         elevator_positionL = 0;
         leftArm.setTargetPosition((int)elevator_positionL);
@@ -127,37 +145,46 @@ public class Elevator {
 
 
     public void task(double timestamp){
-                double currentHeightL = calcularAlturaBraço(leftArm.getCurrentPosition());
-                double currentHeightR = calcularAlturaBraço(rightArm.getCurrentPosition());
+        if(climbing){
+            armVelocityL = -1;
+            armVelocityR = -1;
+            if(leftArm.getCurrentPosition()<10)
+                armVelocityL = -0.3;
+            if(rightArm.getCurrentPosition()<10)
+                armVelocityR = -0.3;
+        }
+        else {
+            double currentHeightL = calcularAlturaBraço(leftArm.getCurrentPosition());
+            double currentHeightR = calcularAlturaBraço(rightArm.getCurrentPosition());
 
-                errorL = elevator_positionL - leftArm.getCurrentPosition();
-                errorR = elevator_positionR - rightArm.getCurrentPosition();
-                double dt = timestamp - lastTimestamp;
-                lastTimestamp = timestamp;
-                double derivativeL = (errorL - prevErrorL)/dt;
-                double derivativeR = (errorR - prevErrorR)/dt;
+            errorL = elevator_positionL - leftArm.getCurrentPosition();
+            errorR = elevator_positionR - rightArm.getCurrentPosition();
+            double dt = timestamp - lastTimestamp;
+            lastTimestamp = timestamp;
+            double derivativeL = (errorL - prevErrorL) / dt;
+            double derivativeR = (errorR - prevErrorR) / dt;
 
-                if (currentHeightL > activationHeight) {
-                    integralL += errorL * dt;
-                }
-                if (currentHeightR > activationHeight) {
-                    integralR += errorR * dt;
-                }
+            if (currentHeightL > activationHeight) {
+                integralL += errorL * dt;
+            }
+            if (currentHeightR > activationHeight) {
+                integralR += errorR * dt;
+            }
 
-                armVelocityL = (errorL * kP) + (integralL * kI) + (kD * derivativeL);
-                armVelocityR = (errorR * kP) + (integralR * kI) + (kD * derivativeR);
+            armVelocityL = (errorL * kP) + (integralL * kI) + (kD * derivativeL);
+            armVelocityR = (errorR * kP) + (integralR * kI) + (kD * derivativeR);
 
 
-                prevErrorL = errorL;
-                prevErrorR = errorR;
+            prevErrorL = errorL;
+            prevErrorR = errorR;
 
-                if(elevator_positionL==0 && leftArm.getCurrentPosition()<10){
-                    armVelocityL = 0;
-                 }
-                if(elevator_positionR==0 && rightArm.getCurrentPosition()<10){
-                    armVelocityR = 0;
-                }
-
+            if (elevator_positionL == 0 && leftArm.getCurrentPosition() < 10) {
+                armVelocityL = 0;
+            }
+            if (elevator_positionR == 0 && rightArm.getCurrentPosition() < 10) {
+                armVelocityR = 0;
+            }
+        }
                 leftArm.setPower(armVelocityL);
                 rightArm.setPower(armVelocityR);
             }

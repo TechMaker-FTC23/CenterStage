@@ -7,7 +7,7 @@ public class Claw {
 
     private final double initPosition = 0.5;
     private final double clawOpenPosition = 0.5;
-    private final double clawClosedPosition = 0.72;
+    private final double clawClosedPosition = 0.74;
 
     private Servo claw;
 

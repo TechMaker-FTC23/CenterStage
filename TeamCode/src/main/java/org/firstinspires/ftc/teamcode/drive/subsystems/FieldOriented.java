@@ -1,16 +1,31 @@
 package org.firstinspires.ftc.teamcode.drive.subsystems;
 
+import static org.firstinspires.ftc.teamcode.drive.subsystems.DriveConstants.MOTOR_VELO_PID;
+import static org.firstinspires.ftc.teamcode.drive.subsystems.DriveConstants.RUN_USING_ENCODER;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.util.Encoder;
 
 public class FieldOriented{
+    public static double TICKS_PER_REV = 8192;
+    public static double WHEEL_RADIUS = 0.75; // in
+    public static double GEAR_RATIO = 1; // output (wheel) speed / input (encoder) speed
+
+    public static double PARALLEL_X = 4.645669; // X is the up and down direction
+    public static double PARALLEL_Y = -2.87402; // Y is the strafe direction
+
+    public static double PERPENDICULAR_X = 3.4;
+    public static double PERPENDICULAR_Y = 0.393701;
     private DcMotor frontLeftMotor, backLeftMotor, frontRightMotor, backRightMotor;
     private IMU imu;
+    public Encoder parallelEncoder, perpendicularEncoder;
 
     public void init(HardwareMap hardwareMap) {
         // Initialize motors and IMU here
@@ -37,8 +52,32 @@ public class FieldOriented{
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD));
         // Without this, the REV Hub's orientation is assumed to be logo up / USB forward
         imu.initialize(parameters);
-    }
+        parallelEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "leftFront"));
+        perpendicularEncoder = new Encoder(hardwareMap.get(DcMotorEx.class, "rightFront"));
 
+        // TODO: reverse any encoders using Encoder.setDirection(Encoder.Direction.REVERSE)
+        perpendicularEncoder.setDirection(Encoder.Direction.REVERSE);
+
+    }
+    public void zeroEncoder(){
+        frontLeftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        frontRightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        frontLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        frontRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+    }
+    public static double encoderTicksToInches(double ticks) {
+        return WHEEL_RADIUS * 2 * Math.PI * GEAR_RATIO * ticks / TICKS_PER_REV;
+    }
+    public static double encoderTicksToCentimeter(double ticks) {
+        return (WHEEL_RADIUS * 2 * Math.PI * GEAR_RATIO * ticks / TICKS_PER_REV)*2.54;
+    }
+    public double getParallelPosition(){
+        return encoderTicksToCentimeter(parallelEncoder.getCurrentPosition());
+    }
+    public double getPerpendicularPosition(){
+        return encoderTicksToCentimeter(perpendicularEncoder.getCurrentPosition());
+    }
     public void fieldOrientedDrive(double y, double x, double rx) {
         double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
@@ -65,4 +104,8 @@ public class FieldOriented{
     public void resetIMU() {
         imu.resetYaw();
     }
+    public double getRawExternalHeading() {
+        return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+    }
+
 }

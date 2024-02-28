@@ -5,9 +5,10 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.drive.subsystems.Elevator;
 import org.firstinspires.ftc.teamcode.drive.subsystems.Claw;
+import org.firstinspires.ftc.teamcode.drive.subsystems.Climber;
+import org.firstinspires.ftc.teamcode.drive.subsystems.FieldOriented;
 import org.firstinspires.ftc.teamcode.drive.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.drive.subsystems.Launcher;
 import org.firstinspires.ftc.teamcode.drive.subsystems.SampleMecanumDrive;
@@ -18,87 +19,119 @@ import org.firstinspires.ftc.teamcode.drive.subsystems.TwoWheelTrackingLocalizer
 @Autonomous(group="drive")
 public class AutonomoAzul extends LinearOpMode {
 
-    TwoWheelTrackingLocalizer localizer;
+    FieldOriented fieldOriented = new FieldOriented();
 
     @Override
     public void runOpMode() throws InterruptedException {
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        double speed = 0.35;
+        fieldOriented.init(hardwareMap);
+        Intake intake = new Intake(hardwareMap);
+        Elevator arm = new Elevator(hardwareMap);
+        Launcher launcher = new Launcher(hardwareMap);
         Claw claw = new Claw(hardwareMap);
         waitForStart();
-        localizer = new TwoWheelTrackingLocalizer(hardwareMap, drive);
 
-        drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        //launcher.stop();
-        //elevator.resetElevatorEncoders();
-        drive.resetHeading();
-        drive.resetEncoder();
         Waypoints[] waypoints = {
-                /*new Waypoints(-36, 0, 0, 200),
-                new Waypoints(0, 30, 0, 200)*/
-                new Waypoints(-10, 0, 0,0,0,0 )
-
+                new Waypoints(0, 10, 0, false, false, false, false, 50),
+                new Waypoints(10, 0, 0, false, false, false, false, 50),
+                new Waypoints(0, 0, 179, false, false, false, false,50),
+                new Waypoints(0, 0, 0, false, false, false, false,50 )/*,
+                new Waypoints(0, 0, 2000, false, false, true, false,500 ),
+                new Waypoints(0, 0, 0, false, false, true, false,500 ),
+                new Waypoints(0, 5, 0, false, false, true, false,0 ),
+                new Waypoints(0, 0, 0, false, false, true, true,0 ),
+                new Waypoints(0, 5, 0, false, false, false, false,0 ),*/
         };
 
         while (!isStopRequested()) {
-            double speed = 0.5;
 
-            for (int idx = 0; idx < waypoints.length; idx++) {
-                if (isStopRequested()) {
+            for (int idx=0; idx<waypoints.length;idx++) {
+                if(isStopRequested()){
                     break;
                 }
-                Waypoints w = waypoints[idx];
-                drive.resetEncoder();
+                Waypoints w =  waypoints[idx];
+                fieldOriented.zeroEncoder();
+                //fieldOriented.resetIMU();
 
-                drive.setLimiterAuto(0.01);
-                if (w.right < 0)
-                    drive.setWeightedDrivePowerAuto(new Pose2d(-speed, 0, 0));
+
+                /*if(arm.getCurrentArmPosition()>10)
+                    drive.setLimiterAuto(0.1);
                 else
-                    drive.setWeightedDrivePowerAuto(new Pose2d(speed, 0, 0));
+                    drive.setLimiterAuto(speed);*/
+                if(w.x<0)
+                    fieldOriented.fieldOrientedDrive(0, -speed, 0);
 
-                while (Math.abs(localizer.getPerpendicularPosition()) < Math.abs(w.right)) {
-                    drive.update();
-                    updateTelemetry(w);
-                }
-
-
-
-                if (w.left < 0)
-                    drive.setWeightedDrivePowerAuto(new Pose2d(0, -speed, 0));
                 else
-                    drive.setWeightedDrivePowerAuto(new Pose2d(0, speed, 0));
+                    fieldOriented.fieldOrientedDrive(0, speed, 0);
 
-                while (Math.abs(localizer.getParallelPosition()) < Math.abs(w.left)) {
-                    drive.update();
-                    updateTelemetry(w);
-                }
 
-                while (localizer.getHeading() > w.heading) {
-                    drive.setWeightedDrivePowerAuto(new Pose2d(0, 0, speed));
-                    updateTelemetry(w);
+                while(Math.abs(fieldOriented.getPerpendicularPosition())<Math.abs( w.x)) {
+                    updateTelemetry();
                 }
-                updateTelemetry(w);
-                drive.setWeightedDrivePowerAuto(new Pose2d(0, 0, 0));
-                for (int i =0; i<w.timeout;i++){
+                fieldOriented.fieldOrientedDrive(0, 0, 0);
+
+                if(w.y<0)
+                    fieldOriented.fieldOrientedDrive(-speed,0, 0);
+                else
+                    fieldOriented.fieldOrientedDrive(speed,0, 0);
+
+                while(Math.abs(fieldOriented.getParallelPosition())<Math.abs( w.y)) {
+                    updateTelemetry();
+                }
+                fieldOriented.fieldOrientedDrive(0, 0, 0);
+
+                if(w.heading<0)
+                    fieldOriented.fieldOrientedDrive(0,0,-speed);
+                else
+                    fieldOriented.fieldOrientedDrive(0,0,speed);
+
+                while(Math.abs(fieldOriented.getRawExternalHeading())<Math.abs( w.heading)) {
+                    updateTelemetry();
+                }
+                fieldOriented.fieldOrientedDrive(0, 0, 0);
+
+
+                if(w.actIntake){
+                    intake.activate();
+                }
+                else if(w.actReverse){
+                    intake.close();
+                }
+                else{
+                    intake.stop();
+                }
+                if(w.extendElevator){
+                    arm.activate();
+                }
+                else{
+                    arm.reverse();
+                }
+                if(w.openClaw){
+                    claw.open();
+                }
+                else{
+                    claw.close();
+                }
+                for (int i =0; i<(w.timeout/10);i++){
                     sleep(1);
-                    //elevator.task();
-                    updateTelemetry(w);
+                    arm.task(getRuntime());
+                    updateTelemetry();
                 }
-
-
             }
 
             break;
         }
+        while (!isStopRequested()) {
+            arm.task(getRuntime());
+        }
 
     }
-    void updateTelemetry(Waypoints w){
-        telemetry.addData("Heading",localizer.getHeading());
-        telemetry.addData("Parallel",localizer.getParallelPosition());
-        telemetry.addData("Perpendicular",localizer.getPerpendicularPosition());
-        telemetry.addData("Tempo",w.timeout);
-        telemetry.addData("Waypoint X",w.right);
-        telemetry.addData("Waypoint Y",w.left);
-        telemetry.addData("Waypoint H",w.heading);
+    void updateTelemetry(){
+        telemetry.addData("Heading",fieldOriented.getRawExternalHeading());
+        telemetry.addData("Parallel",fieldOriented.getParallelPosition());
+        telemetry.addData("Perpendicular",fieldOriented.getPerpendicularPosition());
+
         telemetry.update();
     }
+
 }

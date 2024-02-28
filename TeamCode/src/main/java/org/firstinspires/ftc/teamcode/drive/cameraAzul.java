@@ -25,10 +25,9 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 import org.openftc.easyopencv.OpenCvWebcam;
-@Disabled
 
 @Autonomous
-public class AutonomoTeste extends LinearOpMode {
+public class cameraAzul extends LinearOpMode {
 
     OpenCvWebcam webcam = null; //declarar a webcam
     String linha;
@@ -65,12 +64,12 @@ public class AutonomoTeste extends LinearOpMode {
         double rightavgfin;
         double midavgfin;
         Mat output = new Mat();
-        Scalar rectColor = new Scalar(0.0, 0.0, 255.0);
+        Scalar rectColor = new Scalar(255.0, 0.0, 0.0);
         //função proscessFrame, irá detectar a localização geral de um objeto
         public Mat processFrame(Mat input){
             // e dividir o nosso espaço de vizualização em 3 quadrantes
             //parametros de altura e largura de cada quadrante
-            Imgproc.cvtColor(input, YCbCr, Imgproc.COLOR_RGB2YCrCb); //converter o feedback da camera para YCbCr, deixa o desempenho melhor por otimiza-lo
+            Imgproc.cvtColor(input, YCbCr, Imgproc.COLOR_BGR2YCrCb); //converter o feedback da camera para YCbCr, deixa o desempenho melhor por otimiza-lo
             telemetry.addLine("Pipeline rodando");
 
             Rect leftRect = new Rect(1, 1, 639, 1079);

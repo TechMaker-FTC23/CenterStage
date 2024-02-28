@@ -47,7 +47,7 @@ public class TechMakerTeleop extends LinearOpMode {
 
        Elevator elevator = new Elevator(hardwareMap);
 
-      // Launcher launcher = new Launcher(hardwareMap);
+       Launcher launcher = new Launcher(hardwareMap);
 
        Claw claw = new Claw(hardwareMap);
 
@@ -101,6 +101,10 @@ public class TechMakerTeleop extends LinearOpMode {
                     elevator.activate();
                 } else if (gamepad2.cross) {
                     elevator.reverse();
+                }else if(gamepad2.circle){
+                    elevator.climber();
+                }else if(gamepad2.y){
+                    elevator.desceClimber();
                 }
                 elevator.task(getRuntime());
 
@@ -115,6 +119,14 @@ public class TechMakerTeleop extends LinearOpMode {
             if (gamepad2.right_bumper) {
                 claw.close();
                 led.desligaLed();
+            }
+
+            //Launcher
+
+            if(gamepad2.dpad_up){
+                launcher.activate();
+            }else {
+                launcher.stop();
             }
 
 
