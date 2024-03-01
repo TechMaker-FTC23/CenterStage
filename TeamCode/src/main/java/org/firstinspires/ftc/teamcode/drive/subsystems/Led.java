@@ -12,7 +12,7 @@ public class Led {
     }
 
     public void ligaLed(){
-        luzes.setPower(0.3);
+        luzes.setPower(0.5);
     }
 
     public void desligaLed(){

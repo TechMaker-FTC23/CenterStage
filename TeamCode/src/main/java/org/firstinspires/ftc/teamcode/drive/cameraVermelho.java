@@ -4,6 +4,11 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.drive.subsystems.Claw;
+import org.firstinspires.ftc.teamcode.drive.subsystems.Elevator;
+import org.firstinspires.ftc.teamcode.drive.subsystems.FieldOriented;
+import org.firstinspires.ftc.teamcode.drive.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.drive.subsystems.Launcher;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Rect;
@@ -17,6 +22,8 @@ import org.openftc.easyopencv.OpenCvWebcam;
 
 @Autonomous
 public class cameraVermelho extends LinearOpMode {
+    FieldOriented fieldOriented = new FieldOriented();
+    int direction = 0;// 0 - Meio, 1 - direita, 2 - esquerda
 
     OpenCvWebcam webcam = null; //declarar a webcam
     String linha;
@@ -42,6 +49,169 @@ public class cameraVermelho extends LinearOpMode {
         });
 
         waitForStart();
+        waitForStart();
+
+
+        Waypoints[] waypoints = null;
+
+        while (!isStopRequested()) {
+            if(direction==1)
+            {
+                Waypoints[] wp1 = {
+                        new Waypoints(0, 55, 0, false, false, false, false, false,100),
+                        new Waypoints(0,0, -76, false, false, false, false,false, 500),
+                        new Waypoints(0,0, 0, false, true, false, false,false, 500),
+                        new Waypoints(0,0, 76, false, false, false, false,false, 500),
+                        new Waypoints(0,10, 0, false, false, false, false,false, 50),
+                        new Waypoints(0, 0, 76, false, false, false, false,false, 50),
+                        new Waypoints(0, 150, 0, false, false, false, false,false, 50),
+                        new Waypoints(30, 0, 0, false, false, false, false,false, 50),
+                        new Waypoints(0, 0, 0, false, false, true, false,false, 1000),
+                        new Waypoints(0, 0, 0, false, false, true, true,false, 500),
+                        new Waypoints(0, 0, 0, false, false, false, false,false, 50),
+                        new Waypoints(0, 0, -76, false, false, false, false,false, 50),
+                };
+                executeWaypoints(wp1);
+
+                //movimentação pela direita
+            }
+            else if(direction==2){
+
+                Waypoints[] wp2 = {
+                        new Waypoints(0, 55, 0, false, false, false, false, false,100),
+                        new Waypoints(0,0, 76, false, false, false, false,false, 500),
+                        new Waypoints(0,0, 0, false, true, false, false,false, 500),
+                        new Waypoints(0,0, -76, false, false, false, false,false, 500),
+                        new Waypoints(0,10, 0, false, false, false, false,false, 50),
+                        new Waypoints(0, 0, 76, false, false, false, false,false, 50),
+                        new Waypoints(0, 150, 0, false, false, false, false,false, 50),
+                        new Waypoints(30, 0, 0, false, false, false, false,false, 50),
+                        new Waypoints(0, 0, 0, false, false, true, false,false, 1000),
+                        new Waypoints(0, 0, 0, false, false, true, true,false, 500),
+                        new Waypoints(0, 0, 0, false, false, false, false,false, 50),
+                        new Waypoints(0, 0, -76, false, false, false, false,false, 50),
+                };
+                executeWaypoints(wp2);
+
+                //movimentação pela esquerda
+            }
+            else if(direction==3){
+
+                Waypoints[] wp3 = {
+                        new Waypoints(0, 72, 0, false, false, false, false, false,100),
+                        new Waypoints(0,0, 0, false, true, false, false,false, 500),
+                        new Waypoints(0,3, 0, false, true, false, false,false, 50),
+                        new Waypoints(0, 0, 76, false, false, false, false,false, 50),
+                        new Waypoints(0, 150, 0, false, false, false, false,false, 50),
+                        new Waypoints(30, 0, 0, false, false, false, false,false, 50),
+                        new Waypoints(0, 0, 0, false, false, true, false,false, 1000),
+                        new Waypoints(0, 0, 0, false, false, true, true,false, 500),
+                        new Waypoints(0, 0, 0, false, false, false, false,false, 50),
+                        new Waypoints(0, 0, -76, false, false, false, false,false, 50),
+
+                };
+                executeWaypoints(wp3);
+
+                //movimentação pelo meio
+            }
+            break;
+        }
+    }
+
+    void executeWaypoints(Waypoints[] waypoints)
+    {
+        double speed = 0.5;
+        double turnSpeed = 0.4;
+        fieldOriented.init(hardwareMap);
+        Intake intake = new Intake(hardwareMap);
+        Elevator arm = new Elevator(hardwareMap);
+        Launcher launcher = new Launcher(hardwareMap);
+        Claw claw = new Claw(hardwareMap);
+        for (int idx=0; idx<waypoints.length;idx++) {
+            if(isStopRequested()){
+                break;
+            }
+            Waypoints w =  waypoints[idx];
+            fieldOriented.zeroEncoder();
+            fieldOriented.resetIMU();
+
+
+
+
+
+                /*if(arm.getCurrentArmPosition()>10)
+                    drive.setLimiterAuto(0.1);
+                else
+                    drive.setLimiterAuto(speed);*/
+            if(w.x<0)
+                fieldOriented.fieldOrientedDrive(0, -speed, 0);
+
+            else
+                fieldOriented.fieldOrientedDrive(0, speed, 0);
+
+
+            while(Math.abs(fieldOriented.getPerpendicularPosition())<Math.abs( w.x)) {
+                updateTelemetryAuto();
+            }
+            fieldOriented.fieldOrientedDrive(0, 0, 0);
+
+            if(w.y<0)
+                fieldOriented.fieldOrientedDrive(-speed,0, 0);
+            else
+                fieldOriented.fieldOrientedDrive(speed,0, 0);
+
+            while(Math.abs(fieldOriented.getParallelPosition())<Math.abs( w.y)) {
+                updateTelemetryAuto();
+            }
+            fieldOriented.fieldOrientedDrive(0, 0, 0);
+
+            if(w.heading<0)
+                fieldOriented.fieldOrientedDrive(0,0,-turnSpeed);
+            else
+                fieldOriented.fieldOrientedDrive(0,0,turnSpeed);
+
+            while(Math.abs(fieldOriented.getRawExternalHeading())<Math.abs( w.heading)) {
+                updateTelemetryAuto();
+            }
+            fieldOriented.fieldOrientedDrive(0, 0, 0);
+
+
+            if(w.actIntake){
+                intake.activate();
+            }
+            else if(w.actReverse){
+                intake.close();
+            }
+            else{
+                intake.stop();
+            }
+            if(w.extendElevator){
+                arm.activate();
+            }
+            else{
+                arm.reverse();
+            }
+            if(w.openClaw){
+                claw.open();
+            }
+            else{
+                claw.close();
+            }
+            for (int i =0; i<(w.timeout/10);i++){
+                sleep(1);
+                arm.task(getRuntime());
+                updateTelemetryAuto();
+            }
+        }
+
+
+    }
+    void updateTelemetryAuto(){
+        telemetry.addData("Heading",fieldOriented.getRawExternalHeading());
+        telemetry.addData("Parallel",fieldOriented.getParallelPosition());
+        telemetry.addData("Perpendicular",fieldOriented.getPerpendicularPosition());
+
+        telemetry.update();
     }
 
     class Pipeline extends OpenCvPipeline{  //contrução do piperline
@@ -95,14 +265,17 @@ public class cameraVermelho extends LinearOpMode {
                 //objeto está sendo identificado
                 telemetry.addLine("Esquerda");
                 linha = "Esquerda";
+                direction = 2;
                 // movimentação
             } else if (rightavgfin > midavgfin){
                 telemetry.addLine("Direita");
                 linha = "Direita";
+                direction = 1;
                 //movimentação
             } else{
                 telemetry.addLine("Meio");
                 linha = "Meio";
+                direction = 3;
                 //movimentação:
             }
 

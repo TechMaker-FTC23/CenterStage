@@ -1,46 +1,40 @@
 package org.firstinspires.ftc.teamcode.drive;
 
-import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.drive.subsystems.Elevator;
 import org.firstinspires.ftc.teamcode.drive.subsystems.Claw;
-import org.firstinspires.ftc.teamcode.drive.subsystems.Climber;
 import org.firstinspires.ftc.teamcode.drive.subsystems.FieldOriented;
 import org.firstinspires.ftc.teamcode.drive.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.drive.subsystems.Launcher;
-import org.firstinspires.ftc.teamcode.drive.subsystems.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.drive.subsystems.TwoWheelTrackingLocalizer;
-
 
 
 @Autonomous(group="drive")
-public class AutonomoAzul extends LinearOpMode {
+public class blueLeftTeamProp extends LinearOpMode {
 
     FieldOriented fieldOriented = new FieldOriented();
 
     @Override
     public void runOpMode() throws InterruptedException {
-        double speed = 0.35;
+        double speed = 0.4;
+        double turnSpeed = 0.4;
         fieldOriented.init(hardwareMap);
         Intake intake = new Intake(hardwareMap);
         Elevator arm = new Elevator(hardwareMap);
         Launcher launcher = new Launcher(hardwareMap);
         Claw claw = new Claw(hardwareMap);
+
         waitForStart();
 
         Waypoints[] waypoints = {
-                new Waypoints(0, 10, 0, false, false, false, false, 50),
-                new Waypoints(10, 0, 0, false, false, false, false, 50),
-                new Waypoints(0, 0, 179, false, false, false, false,50),
-                new Waypoints(0, 0, 0, false, false, false, false,50 )/*,
-                new Waypoints(0, 0, 2000, false, false, true, false,500 ),
-                new Waypoints(0, 0, 0, false, false, true, false,500 ),
-                new Waypoints(0, 5, 0, false, false, true, false,0 ),
-                new Waypoints(0, 0, 0, false, false, true, true,0 ),
-                new Waypoints(0, 5, 0, false, false, false, false,0 ),*/
+                new Waypoints(0, 55, 0, false, false, false, false, false,100),
+                new Waypoints(0,0, -76, false, false, false, false,false, 500),
+                new Waypoints(0,0, 0, false, true, false, false,false, 500),
+                new Waypoints(0,0, 76, false, false, false, false,false, 500),
+                new Waypoints(0,10, 0, false, false, false, false,false, 50),
+
+
         };
 
         while (!isStopRequested()) {
@@ -51,7 +45,7 @@ public class AutonomoAzul extends LinearOpMode {
                 }
                 Waypoints w =  waypoints[idx];
                 fieldOriented.zeroEncoder();
-                //fieldOriented.resetIMU();
+                fieldOriented.resetIMU();
 
 
                 /*if(arm.getCurrentArmPosition()>10)
@@ -81,9 +75,9 @@ public class AutonomoAzul extends LinearOpMode {
                 fieldOriented.fieldOrientedDrive(0, 0, 0);
 
                 if(w.heading<0)
-                    fieldOriented.fieldOrientedDrive(0,0,-speed);
+                    fieldOriented.fieldOrientedDrive(0,0,-turnSpeed);
                 else
-                    fieldOriented.fieldOrientedDrive(0,0,speed);
+                    fieldOriented.fieldOrientedDrive(0,0,turnSpeed);
 
                 while(Math.abs(fieldOriented.getRawExternalHeading())<Math.abs( w.heading)) {
                     updateTelemetry();
@@ -95,7 +89,7 @@ public class AutonomoAzul extends LinearOpMode {
                     intake.activate();
                 }
                 else if(w.actReverse){
-                    intake.close();
+                    intake.reverseAutonomous();
                 }
                 else{
                     intake.stop();

@@ -25,6 +25,9 @@ public class Intake {
             intakeMotor.setPower(0);
         }
 
+        public void reverseAutonomous(){
+            intakeMotor.setPower(-0.3);
+        }
 
 
     }
